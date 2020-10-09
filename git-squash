@@ -1,0 +1,4 @@
+ git rebase -i HEAD~2
+进入编辑页面后  最上面的其中一个pick 改成s
+你不要的那个commit 改成s
+保存就行了
