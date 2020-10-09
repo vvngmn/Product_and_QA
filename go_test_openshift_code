@@ -1,0 +1,11 @@
+go run test/extended/cli/explain.go -v -test --test_args='--ginkgo.focus=Kubernetes\sresource\sCRUD\soperations\.Pod\sdisplays\sa\sYAML\seditor\sfor\screating\sa\snew\sresource\sinstance$'
+
+===============================================================================================
+origin E2E/exclude test
+编译openshift-test二进制文件：sudo ./hack/env make build WHAT=cmd/openshift-tests
+sudo su
+export KUBECONFIG=...
+_output/local/bin/linux/amd64/openshift-tests run all
+
+_output/local/bin/linux/amd64/openshift-tests  run all --dry-run | grep -E "Console operator should" | _output/local/bin/linux/amd64/openshift-tests run -f -
+
