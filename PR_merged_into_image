@@ -1,0 +1,46 @@
+usage of find_image.rb
+./tools/find_image.rb --query "Bug 1868471" --url https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/
+Querying https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/ against nightly-
+Pattern 'Bug 1868471' found in payload: https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com//releasestream/4.6.0-0.nightly/release/4.6.0-0.nightly-2020-08-22-045850
+
+==========================================
+4.x:
+1. Get console pod image
+2. oc image info <console_pod_image> | grep commit
+3. cd /path/to/console/repo; git pull; and switch branch if needed
+4. git log <commit_id_got_from_step2> | grep '#pr_num’
+
+[ 登陆https://api.ci.openshift.org/console/project/ocp/browse/images
+oc login https://api.ci.openshift.org --token <api.ci login token>
+docker login -u <api-ci-id> -p $(oc whoami -t) registry.svc.ci.openshift.org
+# oc adm release info registry.svc.ci.openshift.org/ocp/release:4.5.0-0.nightly-2020-07-02-021110 --pullspecs | grep console
+  console                                        quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8783be4e5d0360392a5bbc078be8e54594ba5e668a72d6fa79a9d57d902308b1
+  console-operator                               quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3e15a4e1a9da5a32096a1ae45c3c83d568222fcea8d6c3fcbb679727b30e2475
+] -> 以上步骤可以直接查看https://openshift-release-artifacts.svc.ci.openshift.org/4.5.7/release.txt 找console的image sha256
+
+
+quay.io的token去 try.openshift.com  登录之后 有个pull secret
+把里面quay.io的token copy一下 放到docker config里 然后再试试oc image info命令
+[root@preserved-qe-ui-rhel-1 ~]# oc image info quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:8783be4e5d0360392a5bbc078be8e54594ba5e668a72d6fa79a9d57d902308b1 | grep commit
+             io.openshift.build.commit.id=e9edd01df4f96907c2bccf1a14af23764af3ee23
+             io.openshift.build.commit.url=https://github.com/openshift/console/commit/e9edd01df4f96907c2bccf1a14af23764af3ee23
+
+
+
+[root@preserved-qe-ui-rhel-1 console]# git log e9edd01df4f96907c2bccf1a14af23764af3ee23 | grep '#5543’    //nothing returns
+
+
+
+# oc adm release info registry.svc.ci.openshift.org/ocp/release:4.6.0-0.nightly-2020-06-30-020342 --pullspecs | grep console
+  console                                        quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c68edf89c7f19a478c98d55a96963fd975903ef84048c32ea0d82ec7be2af158
+  console-operator                               quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c734816ba5a7bfa4bc17c4cf2212390704ce7a0b80958af5550db66067e930c0
+[root@preserved-qe-ui-rhel-1 console]# oc image info quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c68edf89c7f19a478c98d55a96963fd975903ef84048c32ea0d82ec7be2af158 | grep commit
+             io.openshift.build.commit.id=8c4d53107d8b3ab5bc39af575d04e923ab9fe769
+             io.openshift.build.commit.url=https://github.com/openshift/console/commit/8c4d53107d8b3ab5bc39af575d04e923ab9fe769
+[root@preserved-qe-ui-rhel-1 console]# git checkout master
+Switched to branch 'master'
+[root@preserved-qe-ui-rhel-1 console]# git log 8c4d53107d8b3ab5bc39af575d04e923ab9fe769 | grep '#5543'
+    Merge pull request #5543 from rebeccaalpert/project-selector
+
+3.x:
+https://mojo.redhat.com/docs/DOC-1074016
